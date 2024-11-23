@@ -3,7 +3,26 @@ from psycopg2.extensions import connection
 import config
 
 
-class DatabaseConnection:
+class _DDL:
+    def __init__(self):
+        self.connection = DatabaseConnector().connection
+
+    def _create_service_table(self):
+        pass
+
+    def _create_atelier_table(self):
+        pass
+
+    def _create_service_cost_in_atelier_table(self):
+        pass
+
+    def create_tables(self):
+        self._create_service_table()
+        self._create_atelier_table()
+        self._create_service_cost_in_atelier_table()
+
+
+class DatabaseConnector:
     """Класс для реализации Singleton подключения к PostgreSQL."""
     _instance = None
     _connection = None
@@ -12,6 +31,7 @@ class DatabaseConnection:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._connection = cls._create_connection()
+            _DDL().create_tables()
         return cls._instance
 
     @staticmethod
@@ -32,5 +52,4 @@ class DatabaseConnection:
     def close(self) -> None:
         if self._connection:
             self._connection.close()
-            print("Соединение с базой данных закрыто.")
             self._connection = None
