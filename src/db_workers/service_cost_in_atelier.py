@@ -4,14 +4,21 @@ from entities import ServiceCostInAtelier as CostEntity
 
 
 class _CostData(NamedTuple):
-    service_id: int
-    atelier_id: int
     cost: Decimal
 
 
-class Service:
-    def create_atelier(self, service_data: _CostData) -> CostEntity:
+class ServiceCostInAtelier:
+    def create_cost(self, service_id: int, atelier_id: int, service_data: _CostData) -> CostEntity:
         ...
 
-    def create_ateliers(self, service_data: list[_CostData]) -> list[CostEntity]:
+    def update_cost(self, service_id: int, atelier_id: int, service_data: _CostData) -> CostEntity:
+        ...
+
+    def get_all_costs(self) -> list[CostEntity]:
+        ...
+
+    def delete_cost(self, service_id: int, atelier_id: int) -> None:
+        ...
+
+    def clean_table(self) -> None:
         ...
