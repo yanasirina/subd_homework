@@ -3,7 +3,7 @@ from psycopg2.extensions import connection
 from entities import Atelier as AtelierEntity
 
 
-class _AtelierData(NamedTuple):
+class AtelierData(NamedTuple):
     name: str
     address: str
     phone_number: str
@@ -13,7 +13,7 @@ class Atelier:
     def __init__(self, connection: connection):
         self.connection = connection
 
-    def create_atelier(self, atelier_data: _AtelierData) -> AtelierEntity:
+    def create_atelier(self, atelier_data: AtelierData) -> AtelierEntity:
         query = """
         INSERT INTO atelier (name, address, phone_number)
         VALUES (%s, %s, %s)
@@ -25,19 +25,21 @@ class Atelier:
             self.connection.commit()
         return AtelierEntity(*result)
 
-    def create_ateliers(self, atelier_data: list[_AtelierData]) -> list[AtelierEntity]:
+    def create_ateliers(self, atelier_data: list[AtelierData]) -> list[AtelierEntity]:
         query = """
         INSERT INTO atelier (name, address, phone_number)
         VALUES (%s, %s, %s)
         RETURNING atelier_id, name, address, phone_number;
         """
         with self.connection.cursor() as cursor:
-            cursor.executemany(query, [(data.name, data.address, data.phone_number) for data in atelier_data])
-            results = cursor.fetchall()
+            results = []
+            for data in atelier_data:
+                cursor.execute(query, (data.name, data.address, data.phone_number))
+                results.append(cursor.fetchone())  # Получаем результат для каждой вставленной записи
             self.connection.commit()
         return [AtelierEntity(*row) for row in results]
 
-    def update_atelier(self, atelier_id: int, atelier_data: _AtelierData) -> AtelierEntity:
+    def update_atelier(self, atelier_id: int, atelier_data: AtelierData) -> AtelierEntity:
         query = """
         UPDATE atelier
         SET name = %s, address = %s, phone_number = %s
@@ -50,14 +52,10 @@ class Atelier:
             self.connection.commit()
         return AtelierEntity(*result)
 
-    def get_ateliers(self, limit: int = None, offset: int = None) -> list[AtelierEntity]:
+    def get_ateliers(self) -> list[AtelierEntity]:
         query = "SELECT atelier_id, name, address, phone_number FROM atelier"
-        if limit is not None:
-            query += " LIMIT %s"
-        if offset is not None:
-            query += " OFFSET %s"
         with self.connection.cursor() as cursor:
-            cursor.execute(query, (limit, offset) if limit and offset else ())
+            cursor.execute(query)
             results = cursor.fetchall()
         return [AtelierEntity(*row) for row in results]
 

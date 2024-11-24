@@ -1,3 +1,3 @@
-from .atelier import Atelier
-from .service import Service
-from .service_cost_in_atelier import ServiceCostInAtelier
+from .atelier import Atelier, AtelierData
+from .service import Service, ServiceData
+from .service_cost_in_atelier import ServiceCostInAtelier, CostData
