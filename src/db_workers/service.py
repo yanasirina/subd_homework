@@ -1,4 +1,5 @@
 from typing import NamedTuple
+from psycopg2.extensions import connection
 from entities import Service as ServiceEntity
 
 
@@ -8,6 +9,9 @@ class _ServiceData(NamedTuple):
 
 
 class Service:
+    def __init__(self, connection: connection):
+        self.connection = connection
+
     def create_service(self, service_data: _ServiceData) -> ServiceEntity:
         ...
 
@@ -17,7 +21,7 @@ class Service:
     def update_service(self, service_id: int, service_data: _ServiceData) -> ServiceEntity:
         ...
 
-    def get_all_services(self) -> list[ServiceEntity]:
+    def get_services(self, limit: int = None, offset: int = None) -> list[ServiceEntity]:
         ...
 
     def get_service_by_id(self, service_id: int) -> ServiceEntity:
